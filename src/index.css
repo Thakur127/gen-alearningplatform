@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&family=PT+Sans&family=Poppins&family=Roboto&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .back-btn {
+        /* add hover effect */
+        @apply px-4 py-2 rounded-md bg-gray-200/80 hover:bg-gray-200 transition-colors duration-100 text-sm cursor-pointer text-zinc-800;
+    }
+}
+
+@layer utilities {
+    .input {
+        @apply w-full p-2 bg-transparent border rounded-md text-zinc-700 hover:border-slate-300 outline-none transition-colors focus:border-slate-300
+        text-sm
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'PT Sans', 'Open Sans', 'Roboto', 'Poppins', 'serif' ;
+}
