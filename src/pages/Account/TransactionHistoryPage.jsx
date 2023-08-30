@@ -2,14 +2,6 @@ import React from "react";
 import { useQuery } from "react-query";
 import useGetUser from "../../hooks/useGetUser";
 import axiosInstance from "../../api/axios";
-import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
-  Box,
-  Flex,
-} from "@chakra-ui/react";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { Link } from "react-router-dom";
 
@@ -20,7 +12,6 @@ const TransactionHistoryPage = () => {
     queryKey: ["transaction-history", user],
     queryFn: async () => {
       const { data } = await axiosInstance.get("/payments/transactions/");
-      console.log(data);
       return data;
     },
     enabled: !!user,

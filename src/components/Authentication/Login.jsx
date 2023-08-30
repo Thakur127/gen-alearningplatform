@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import axios from "../../api/axios";
 import { Button, useToast } from "@chakra-ui/react";
+import axiosInstance from "../../api/axios";
+import { useQuery } from "react-query";
+import setCookie from "../../lib/setCookie";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
@@ -13,30 +15,44 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
+  const { refetch: fetchUser } = useQuery({
+    queryKey: "currentUser",
+  });
 
   const loginWithCredentials = async (e) => {
     e.preventDefault();
 
     setIsLoading(true);
     try {
-      const res = await axios.post("/auth/login/", credentials);
-      // console.log(res.data);
+      const res = await axiosInstance.post("/auth/login/", credentials);
+
       const auth_expiration = new Date(
         res.data.refresh_expiration
       ).toUTCString();
-      document.cookie =
-        "_auth=" +
-        btoa(true) +
-        ";" +
-        "expires=" +
-        auth_expiration +
-        ";" +
-        "sameSite=lax;";
+
+      const access_expiration = new Date(
+        res.data.access_expiration
+      ).toUTCString();
+
+      setCookie("_auth", btoa(true), {
+        expireIn: auth_expiration,
+        sameSite: "lax",
+        secure: false,
+      });
+      setCookie("auth_access_token", res.data.access, {
+        expireIn: access_expiration,
+      });
+      setCookie("auth_refresh_token", res.data?.refresh, {
+        expireIn: auth_expiration,
+      });
+
+      // fetch current user
+      fetchUser();
 
       // redirect to dashbaord
-
-      window.location.pathname = location.state ? location.state : "/dashboard";
-      // navigate("/dashboard", { replace: true });
+      navigate(location.state ? location.state : "/dashboard/", {
+        replace: true,
+      });
     } catch (error) {
       // console.log(error);
       console.log(error);
