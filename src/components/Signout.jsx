@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "react-query";
 
 const Signout = () => {
-  const [signoutSuccess, setSignoutSuccess] = useState(false);
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
@@ -16,7 +15,6 @@ const Signout = () => {
         queryClient.invalidateQueries("currentUser");
 
         await axiosInstance.post("/auth/logout/");
-        setSignoutSuccess(true);
 
         // clear user info
         deleteAllCookies();
@@ -28,10 +26,8 @@ const Signout = () => {
         navigate("/login", { replace: true });
       } catch (error) {}
     };
-    if (!signoutSuccess) {
-      logout();
-    }
-  }, [signoutSuccess]);
+    logout();
+  }, []);
 
   return (
     <Box className="absolute inset-0">
