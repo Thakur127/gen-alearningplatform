@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import axiosInstance from "../api/axios";
+import axiosInstance from "../../api/axios";
 import { Box, Spinner } from "@chakra-ui/react";
-import deleteAllCookies from "../lib/deleteAllCookies";
+import deleteAllCookies from "../../lib/deleteAllCookies";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "react-query";
 

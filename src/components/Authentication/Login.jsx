@@ -35,15 +35,15 @@ const Login = () => {
       ).toUTCString();
 
       setCookie("_auth", btoa(true), {
-        expireIn: auth_expiration,
-        sameSite: "lax",
-        secure: false,
+        expires: res.data.refersh_expiration,
       });
       setCookie("auth_access_token", res.data.access, {
-        expireIn: access_expiration,
+        expireIn: res.data.access_expiration,
+        secure: true,
       });
       setCookie("auth_refresh_token", res.data?.refresh, {
-        expireIn: auth_expiration,
+        expireIn: res.data.refresh_expiration,
+        secure: true,
       });
 
       // fetch current user

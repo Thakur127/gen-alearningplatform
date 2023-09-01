@@ -23,7 +23,7 @@ import MyCoursesPage from "./pages/Course/MyCoursesPage";
 import EnrolledCoursesPage from "./pages/Course/EnrolledCoursesPage";
 import ProtectedRoute from "./components/Routes/ProtectedRoute";
 
-import Signout from "./components/Signout";
+import Signout from "./components/Authentication/Signout";
 import LectureDetailPage from "./pages/Course/LectureDetailPage";
 import NewCoursePage from "./pages/Course/NewCoursePage";
 import ProfilePage from "./pages/Account/ProfilePage";
@@ -78,6 +78,8 @@ const App = () => {
               />
               <Route path="/logout/" element={<Signout />} />
             </Route>
+
+            {/* Protected Routes for teacher */}
             <Route element={<ProtectedRoute allowedRoles={[ROLES.Teacher]} />}>
               <Route path="/create-course/" element={<NewCoursePage />} />
               <Route path="/my-courses/" element={<MyCoursesPage />} />
