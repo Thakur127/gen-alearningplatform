@@ -90,7 +90,12 @@ const AddReviewBox = ({ course_id }) => {
           });
         }}
       />
-      <Button isLoading={addReview.isLoading} variant={"primary"} type="submit">
+      <Button
+        isLoading={addReview.isLoading}
+        isDisabled={review?.review === "" || review?.rating === 0}
+        variant={"primary"}
+        type="submit"
+      >
         Post
       </Button>
     </form>

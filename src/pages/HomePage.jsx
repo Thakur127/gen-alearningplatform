@@ -36,8 +36,8 @@ const HomePage = () => {
   });
 
   return (
-    <div>
-      <div className="container py-4 lg:px-16 space-y-4">
+    <div className="flex flex-col h-screen">
+      <div className="container py-4 lg:px-16 space-y-4 flex-1">
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h2 className="text-lg lg:text-2xl font-semibold">
@@ -91,7 +91,9 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      <div className="my-auto">
+        <Footer />
+      </div>
     </div>
   );
 };

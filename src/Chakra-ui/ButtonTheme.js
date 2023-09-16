@@ -8,6 +8,19 @@ const primary = defineStyle({
   fontSize: "sm",
   paddingX: "1rem",
   borderRadius: "6px",
+  _hover: {
+    _disabled: {
+      bg: "gray.900",
+      color: "gray.200",
+      borderColor: "gray.900",
+    },
+  },
+
+  _disabled: {
+    bg: "gray.900",
+    color: "gray.200",
+    borderColor: "gray.900",
+  },
 });
 
 const buttonTheme = defineStyleConfig({

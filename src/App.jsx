@@ -32,6 +32,7 @@ import PaymentCompletedPage from "./pages/PaymentCompletedPage";
 import TransactionHistoryPage from "./pages/Account/TransactionHistoryPage";
 import TransactionDetailPage from "./pages/Account/TransactionDetailPage";
 import SearchPage from "./pages/SearchPage";
+import Error404 from "./pages/Error404";
 
 const ROLES = {
   Teacher: "Teacher",
@@ -99,6 +100,8 @@ const App = () => {
                 element={<ResetPassword />}
               />
             </Route>
+            {/* Error Page */}
+            <Route path="/*" element={<Error404 />} />
           </Routes>
         </div>
       </Router>

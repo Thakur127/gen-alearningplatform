@@ -24,7 +24,7 @@ const UserMenu = ({ user }) => {
               {user?.first_name} {user?.last_name}
             </Text>
             <Text as="span" className=" text-xs lg:text-sm text-gray-500">
-              {user?.role}
+              @{user?.username}
             </Text>
           </Box>
         </Flex>

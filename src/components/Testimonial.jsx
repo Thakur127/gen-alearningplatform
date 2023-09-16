@@ -58,7 +58,7 @@ const Testimonial = ({ review }) => {
       }`}
     >
       <section>
-        <Avatar src={review.owner?.cover_img} name={review?.owner?.username} />
+        <Avatar src={review.owner?.image_url} name={review?.owner?.username} />
       </section>
       <section className="flex-1">
         <div className="flex items-start justify-between">

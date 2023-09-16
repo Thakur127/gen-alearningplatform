@@ -174,16 +174,7 @@ const Profile = ({ user, courses }) => {
                     <p className="text-blue-500">0 Collaborations</p>
                   </div>
                 ) : (
-                  <div className="mt-4 flex gap-4">
-                    <Button
-                      onClick={() => {
-                        navigate("/dashboard/");
-                      }}
-                      variant={"primary"}
-                    >
-                      Go to dashboard
-                    </Button>
-                  </div>
+                  <></>
                 )}
               </div>
             </div>

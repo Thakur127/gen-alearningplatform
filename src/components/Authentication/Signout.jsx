@@ -12,9 +12,9 @@ const Signout = () => {
   useEffect(() => {
     const logout = async () => {
       try {
-        queryClient.invalidateQueries("currentUser");
-
         await axiosInstance.post("/auth/logout/");
+
+        queryClient.invalidateQueries("currentUser");
 
         // clear user info
         deleteAllCookies();

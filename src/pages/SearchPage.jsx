@@ -55,7 +55,8 @@ const SearchPage = () => {
     newSearchParams.set("q", newQuery);
 
     // Replace the history state with the updated search params
-    navigate(`?${newSearchParams.toString()}`, { replace: true });
+    // navigate(`?${newSearchParams.toString()}`, { replace: true });
+    navigate(`/search/?q=${newQuery}`, { replace: true });
 
     // Update the state for the query
     setSearchParams({ q: newQuery });

@@ -54,6 +54,8 @@ import moment from "moment/moment";
 import useCourseReviews from "../../hooks/useCourseReviews";
 
 const CourseDetailPage = () => {
+  const [course, setCourse] = useState(null);
+
   const { course_id } = useParams();
 
   // const [course, setCourse] = useState(null);
@@ -65,7 +67,7 @@ const CourseDetailPage = () => {
   const toast = useToast();
   const { data: user } = useGetUser();
 
-  const { data: course } = useQuery({
+  const {} = useQuery({
     queryKey: ["course", course_id],
     queryFn: async () => {
       const { data } = await axiosInstance.get(`/course/${course_id}/`);
@@ -73,13 +75,8 @@ const CourseDetailPage = () => {
     },
     enabled: !!course_id,
     onSuccess: (data) => {
-      setIsEnrolled(() => {
-        return (
-          data?.owner?.id === user?.id ||
-          data?.enrollments.includes(user?.id) ||
-          data?.instructors?.find((instructor) => instructor?.id === user?.id)
-        );
-      });
+      setCourse(data?.course);
+      setIsEnrolled(data?.enrollment);
     },
   });
 
@@ -223,16 +220,14 @@ const CourseDetailPage = () => {
                       : "No caption available"}
                   </div>
                 </div>
-              </div>
-
-              {!isEnrolled ? (
-                <>
-                  <div
-                    className={`hidden lg:block fixed top-[6rem] right-24 z-10 `}
-                  >
-                    <Card className="w-[350px] overflow-hidden">
-                      <Image src={course?.cover_img} />
-                      {/* <AspectRatio ratio={16 / 9}>
+                {!isEnrolled ? (
+                  <>
+                    <div
+                      className={`hidden lg:block absolute top-[4rem] right-32 z-10 `}
+                    >
+                      <Card className="w-[350px] overflow-hidden">
+                        <Image src={course?.cover_img} />
+                        {/* <AspectRatio ratio={16 / 9}>
                 <ReactPlayer
                   width={"350px"}
                   height={"360"}
@@ -242,125 +237,129 @@ const CourseDetailPage = () => {
                   controls={true}
                 />
               </AspectRatio> */}
-                      <CardBody>
-                        <h3 className="mb-2">
-                          <span className="font-semibold text-xl">
-                            {getSymbolFromCurrency(course?.currency)}
-                            {course?.price}{" "}
-                          </span>
-                        </h3>
-                        <div className="space-y-2">
-                          <Button variant={"primary"} width={"full"}>
-                            Add to Cart
-                          </Button>
-                          <Button
-                            isLoading={buyCourse.isLoading}
-                            colorScheme="green"
-                            fontWeight={"regular"}
-                            fontSize={"sm"}
-                            onClick={() => {
-                              buyCourse.mutate(course?.id);
-                            }}
-                            className="text-sm w-full rounded p-2 bg-emerald-400 text-zinc-100 hover:bg-emerald-500 transition-colors"
-                          >
-                            Buy Now
-                          </Button>
-                        </div>
-                        <p className="text-center text-sm mt-3">
-                          30 day money back gurantee
-                        </p>
-                        <p className="text-center text-xs mt-1">
-                          Full life time access
-                        </p>
-                        <div className="flex justify-around mt-2 ">
-                          <span className="underline underline-offset-2 text-sm cursor-pointer">
-                            Gift this course
-                          </span>
-                          <span className="underline underline-offset-2 text-sm cursor-pointer">
-                            Apply coupon
-                          </span>
-                        </div>
-                      </CardBody>
-                    </Card>
-                  </div>
+                        <CardBody>
+                          <h3 className="mb-2">
+                            <span className="font-semibold text-xl">
+                              {getSymbolFromCurrency(course?.currency)}
+                              {course?.price}{" "}
+                            </span>
+                          </h3>
+                          <div className="space-y-2">
+                            <Button variant={"primary"} width={"full"}>
+                              Add to Cart
+                            </Button>
+                            <Button
+                              isLoading={buyCourse.isLoading}
+                              colorScheme="green"
+                              fontWeight={"regular"}
+                              fontSize={"sm"}
+                              onClick={() => {
+                                buyCourse.mutate(course?.id);
+                              }}
+                              className="text-sm w-full rounded p-2 bg-emerald-400 text-zinc-100 hover:bg-emerald-500 transition-colors"
+                            >
+                              Buy Now
+                            </Button>
+                          </div>
+                          <p className="text-center text-sm mt-3">
+                            30 day money back gurantee
+                          </p>
+                          <p className="text-center text-xs mt-1">
+                            Full life time access
+                          </p>
+                          <div className="flex justify-around mt-2 ">
+                            <span className="underline underline-offset-2 text-sm cursor-pointer">
+                              Gift this course
+                            </span>
+                            <span className="underline underline-offset-2 text-sm cursor-pointer">
+                              Apply coupon
+                            </span>
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </div>
 
-                  {/* For small screen */}
-                  <div className="fixed bg-black container py-4 bottom-0 flex justify-between items-center z-10 lg:hidden">
-                    <h4 className="text-gray-100">
-                      {getSymbolFromCurrency(course?.currency)}
-                      {course?.price}
-                    </h4>
-                    <Button
-                      colorScheme="green"
-                      onClick={() => {
-                        buyCourse.mutate(course_id);
-                      }}
-                    >
-                      Buy Now
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="hidden lg:block fixed top-[6rem] right-24 z-10 w-[400px] bg-gray-200 rounded overflow-hidden shadow-md">
-                  <Image src={course?.cover_img} />
-                  <div className="p-4">
-                    <h3 className="text-xl font-semibold">Lectures</h3>
-                    <Divider className="h-[1px] bg-black my-2" />
-                    <Accordion defaultIndex={[0]} allowMultiple allowToggle>
-                      {course?.lectures.map((lecture, idx) => {
-                        return (
-                          <AccordionItem
-                            key={idx}
-                            border={"1px solid black"}
-                            marginY={"0.5rem"}
-                          >
-                            <h2>
-                              <AccordionButton
-                                _expanded={{ bg: "black", color: "gray.100" }}
-                              >
-                                <AccordionIcon marginRight={"1rem"} />
-                                <Flex flexGrow={1}>
-                                  <Box as="span">{lecture?.title}</Box>
-                                </Flex>
-                                <Box as="span" fontSize={"sm"}>
-                                  {lecture?.duration}
+                    {/* For small screen */}
+                    <div className="fixed bg-black container py-4 bottom-0 flex justify-between items-center z-10 lg:hidden">
+                      <h4 className="text-gray-100">
+                        {getSymbolFromCurrency(course?.currency)}
+                        {course?.price}
+                      </h4>
+                      <Button
+                        colorScheme="green"
+                        onClick={() => {
+                          buyCourse.mutate(course_id);
+                        }}
+                      >
+                        Buy Now
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="hidden lg:block absolute top-[4rem] right-32 z-10 w-[400px] bg-gray-200 rounded overflow-hidden shadow-md">
+                    <Image src={course?.cover_img} />
+                    <div className="p-4">
+                      <h3 className="text-xl font-semibold">Lectures</h3>
+                      <Divider className="h-[1px] bg-black my-2" />
+                      <Accordion defaultIndex={[0]} allowMultiple allowToggle>
+                        {course?.lectures.map((lecture, idx) => {
+                          return (
+                            <AccordionItem
+                              key={idx}
+                              border={"1px solid black"}
+                              marginY={"0.5rem"}
+                            >
+                              <h2>
+                                <AccordionButton
+                                  _expanded={{ bg: "black", color: "gray.100" }}
+                                >
+                                  <AccordionIcon marginRight={"1rem"} />
+                                  <Flex flexGrow={1}>
+                                    <Box as="span">{lecture?.title}</Box>
+                                  </Flex>
+                                  <Box as="span" fontSize={"sm"}>
+                                    {lecture?.duration}
+                                  </Box>
+                                </AccordionButton>
+                              </h2>
+                              <AccordionPanel>
+                                <Box
+                                  className="text-gray-600 mb-2"
+                                  fontSize={"sm"}
+                                >
+                                  {lecture?.description || "No Description."}
                                 </Box>
-                              </AccordionButton>
-                            </h2>
-                            <AccordionPanel>
-                              <Box
-                                className="text-gray-600 mb-2"
-                                fontSize={"sm"}
-                              >
-                                {lecture?.description || "No Description."}
-                              </Box>
-                              <Link
-                                to={`${
-                                  isEnrolled
-                                    ? "/course/" +
-                                      course?.id +
-                                      "/lecture/" +
-                                      lecture?.chapter
-                                    : "#"
-                                }`}
-                                className=""
-                              >
-                                <Button variant={"primary"} borderRadius="2px">
-                                  Watch Video
-                                </Button>
-                              </Link>
-                            </AccordionPanel>
-                          </AccordionItem>
-                        );
-                      })}
-                    </Accordion>
+                                <Link
+                                  to={`${
+                                    isEnrolled
+                                      ? "/course/" +
+                                        course?.id +
+                                        "/lecture/" +
+                                        lecture?.chapter
+                                      : "#"
+                                  }`}
+                                  className=""
+                                >
+                                  <Button
+                                    variant={"primary"}
+                                    borderRadius="2px"
+                                  >
+                                    Watch Video
+                                  </Button>
+                                </Link>
+                              </AccordionPanel>
+                            </AccordionItem>
+                          );
+                        })}
+                      </Accordion>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-            <div className="p-4 lg:px-24 max-w-[700px]">
-              <div className="space-y-4">
-                <div className="border border-gray-400 p-2 bg-white">
+            <div className="py-4 lg:px-24 max-w-[700px]">
+              <div className="space-y-4 ">
+                <div className="container border border-gray-400 p-2 bg-white">
                   <h3 className="text-xl font-semibold">What you'll learn</h3>
                   <ul className="font-inter mt-2 grid grid-cols-2 gap-2 leading-6 indent-4">
                     {JSON.parse(course?.outcomes).map((item, idx) => {

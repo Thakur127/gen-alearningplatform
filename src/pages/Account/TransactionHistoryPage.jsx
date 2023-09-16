@@ -4,6 +4,7 @@ import useGetUser from "../../hooks/useGetUser";
 import axiosInstance from "../../api/axios";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { Link } from "react-router-dom";
+import { Skeleton, Stack } from "@chakra-ui/react";
 
 const TransactionHistoryPage = () => {
   const { data: user } = useGetUser();
@@ -60,6 +61,13 @@ const TransactionHistoryPage = () => {
       <div>
         {!transactions ||
           (transactions?.length === 0 && "No Transaction has done yet.")}
+        {!transactions && (
+          <Stack>
+            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((key) => {
+              return <Skeleton key={key} height={"95px"} rounded={"md"} />;
+            })}
+          </Stack>
+        )}
       </div>
     </div>
   );
