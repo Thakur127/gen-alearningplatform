@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 
 const HomePage = () => {
   const [category, setCategory] = useState("");
+  const uniqueCourseID = [];
 
   const {
     isLoading,
@@ -67,9 +68,12 @@ const HomePage = () => {
           ) : (
             <div className="grid gap-4 sm:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
               {popularCourse?.pages?.map((page) =>
-                page.results.map((course) => (
-                  <FeaturedCourse key={course.id} course={course} />
-                ))
+                page.results.map((course) => {
+                  if (uniqueCourseID.includes(course.id))
+                    return <div key={`-${course.id}`} className="hidden"></div>;
+                  uniqueCourseID.push(course.id);
+                  return <FeaturedCourse key={course.id} course={course} />;
+                })
               )}
             </div>
           )}
