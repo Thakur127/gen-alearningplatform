@@ -18,6 +18,7 @@ const AlertBox = ({
   body,
   confirmTitle,
   cancelTitle = "Cancel",
+  children,
   ...rest
 }) => {
   const cancelRef = React.useRef();
@@ -37,7 +38,10 @@ const AlertBox = ({
             {header}
           </AlertDialogHeader>
 
-          <AlertDialogBody fontSize={"sm"}>{body}</AlertDialogBody>
+          <AlertDialogBody fontSize={"sm"}>
+            {body}
+            {children}
+          </AlertDialogBody>
 
           <AlertDialogFooter>
             <Button ref={cancelRef} onClick={onClose} fontSize={"sm"}>

@@ -15,13 +15,10 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   async (config) => {
-    // Check if an access token is available in local storage
-    // const accessToken = localStorage.getItem("access_token");
-    const accessToken = getCookie("auth_access_token");
+    const accessToken = localStorage.getItem("access_token");
 
-    // If an access token exists, add it to the request headers
     if (accessToken) {
-      config.headers["Authorization"] = "Bearer" + " " + accessToken;
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
     return config;
@@ -33,43 +30,34 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-
   async (error) => {
-    const originalRequest = error?.config;
-    // console.log(error.response);
-    if (
-      error?.response?.status === 401 &&
-      error?.response?.data.detail ===
-        "Authentication credentials were not provided." &&
-      !originalRequest?.__isRetryRequest
-    ) {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest.__isRetryRequest) {
+      originalRequest.__isRetryRequest = true;
+
       try {
-        originalRequest.__isRetryRequest = true;
-
-        // const refresh_token = localStorage.getItem("refresh_token");
-        const refresh_token = getCookie("auth_refresh_token");
+        const refresh_token = localStorage.getItem("refresh_token");
         if (refresh_token) {
-          // fetch new access token
           const res = await refreshToken(refresh_token);
+          localStorage.setItem("access_token", res.data.access);
 
-          // Set Authorization header with new token
-          originalRequest.headers.Authorization =
-            "Bearer" + " " + res.data.access;
+          originalRequest.headers[
+            "Authorization"
+          ] = `Bearer ${res.data.access}`;
+
+          return axiosInstance(originalRequest);
         }
-
-        const retryResponse = await axiosInstance(originalRequest);
-        return retryResponse;
       } catch (refreshError) {
-        // console.error("Failed to refresh token");
-        // console.log(refreshError);
-
         deleteAllCookies();
         localStorage.clear();
         sessionStorage.clear();
 
-        // window.location.pathname = "/login";
+        // Redirect to login page or handle the situation appropriately
+        window.location.pathname = "/login";
       }
     }
+
     return Promise.reject(error);
   }
 );

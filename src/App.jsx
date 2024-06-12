@@ -1,12 +1,6 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Header from "./components/Header";
-// Pages
 
 // public pages
 import UnauthorisedRoute from "./components/Routes/UnauthorisedRoute";
@@ -28,11 +22,15 @@ import LectureDetailPage from "./pages/Course/LectureDetailPage";
 import NewCoursePage from "./pages/Course/NewCoursePage";
 import ProfilePage from "./pages/Account/ProfilePage";
 import MyProfilePage from "./pages/Account/MyProfilePage";
-import PaymentCompletedPage from "./pages/PaymentCompletedPage";
 import TransactionHistoryPage from "./pages/Account/TransactionHistoryPage";
 import TransactionDetailPage from "./pages/Account/TransactionDetailPage";
 import SearchPage from "./pages/SearchPage";
 import Error404 from "./pages/Error404";
+import useGetUser from "./hooks/useGetUser";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentFailedPage from "./pages/PaymentFailedPage";
+import { Spinner } from "@chakra-ui/react";
+import useAuth from "./hooks/useAuth";
 
 const ROLES = {
   Teacher: "Teacher",
@@ -40,8 +38,15 @@ const ROLES = {
 };
 
 const App = () => {
+  const user = useGetUser();
+  const isAuthenticated = useAuth();
   return (
-    <div className="bg-slate-100 text-zinc-800 min-h-screen !antialiased flex flex-col">
+    <div className="bg-slate-100 text-zinc-800 min-h-screen !antialiased flex flex-col relative">
+      {isAuthenticated && !user?.data?.email && (
+        <div className="absolute left-0 top-0 w-full h-screen bg-slate-100 z-[1000] py-12 container flex">
+          <Spinner size={"xl"} className="m-auto" />
+        </div>
+      )}
       <Router>
         <Header />
         <div className="flex-grow relative">
@@ -50,6 +55,7 @@ const App = () => {
             <Route path="/" element={<HomePage />} />
             <Route path="/course/:course_id/" element={<CourseDetailPage />} />
             <Route path="/search/" element={<SearchPage />} />
+            <Route path="/profile/:username/" element={<ProfilePage />} />
 
             {/* Protected Routes */}
             <Route
@@ -58,7 +64,6 @@ const App = () => {
               }
             >
               <Route path="/profile/me/" element={<MyProfilePage />} />
-              <Route path="/profile/:username/" element={<ProfilePage />} />
               <Route path="/dashboard/" element={<EnrolledCoursesPage />} />
 
               <Route
@@ -66,8 +71,12 @@ const App = () => {
                 element={<LectureDetailPage />}
               />
               <Route
-                path="/payment/completed/"
-                element={<PaymentCompletedPage />}
+                path="/payment/success/:session_id/:course_id/"
+                element={<PaymentSuccessPage />}
+              />
+              <Route
+                path="/payment/failed/:course_id/"
+                element={<PaymentFailedPage />}
               />
               <Route
                 path="/transactions/"

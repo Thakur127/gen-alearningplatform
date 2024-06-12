@@ -18,7 +18,6 @@ import {
   Card,
   CardBody,
   Button,
-  Divider,
 } from "@chakra-ui/react";
 import {
   ClosedCaptionOff,
@@ -26,8 +25,7 @@ import {
   FileUploadOutlined,
   Language,
 } from "@mui/icons-material";
-import { StarIcon } from "@heroicons/react/24/outline";
-import Testimonial from "../Testimonial";
+import { CheckIcon, StarIcon } from "@heroicons/react/24/outline";
 import useGetUser from "../../hooks/useGetUser";
 import newLecturesState from "../../atoms/newLecturesState";
 import getSymbolFromCurrency from "currency-symbol-map";
@@ -243,21 +241,19 @@ const LastStep = () => {
               <div className="space-y-4">
                 <div className="border border-gray-400 p-2 bg-white">
                   <h3 className="text-xl font-semibold">What you'll learn</h3>
-                  <ul className="font-inter mt-2 grid grid-cols-2 gap-2 leading-6 indent-4">
+                  <div className="font-inter mt-4 grid grid-cols-2 gap-2">
                     {JSON.parse(courseData?.outcomes).map((item, idx) => {
+                      if (item.length == 0) {
+                        return <></>;
+                      }
                       return (
-                        <div key={idx}>
-                          {item?.length ? (
-                            <li key={idx} className="list-disc list-inside">
-                              {""} {item}
-                            </li>
-                          ) : (
-                            <div></div>
-                          )}
+                        <div key={idx} className="flex items-start">
+                          <CheckIcon className="w-8 h-8 text-green-500 font-bold mr-4" />
+                          <div className="text-sm ">{item}</div>
                         </div>
                       );
                     })}
-                  </ul>
+                  </div>
                 </div>
                 <div className="">
                   <h3 className="text-xl font-semibold">Lectures</h3>
@@ -292,7 +288,7 @@ const LastStep = () => {
                           </h2>
                           <AccordionPanel>
                             <Box className="text-gray-600 mb-2" fontSize={"sm"}>
-                              {lecture?.description || "No Description."}
+                              {lecture?.description}
                             </Box>
                             <Link to="#" className="">
                               <Button variant={"primary"} borderRadius="2px">

@@ -112,16 +112,6 @@ const LectureDetailPage = () => {
               Next
             </Button>
           </Flex>
-          <Box className="space-y-2">
-            <Heading
-              as="h3"
-              fontWeight={"medium"}
-              className="!font-inter !text-lg"
-            >
-              Discussion
-            </Heading>
-            <Comment />
-          </Box>
         </Box>
       ) : (
         <Stack spacing={4}>

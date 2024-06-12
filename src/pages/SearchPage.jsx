@@ -1,18 +1,13 @@
 import {
   AdjustmentsHorizontalIcon,
   ArrowLeftIcon,
-  ArrowLeftOnRectangleIcon,
-  ChevronDoubleLeftIcon,
-  MagnifyingGlassCircleIcon,
-  MagnifyingGlassIcon,
   XMarkIcon,
+  MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import axiosInstance from "../api/axios";
-import { useEffect } from "react";
-import { useQuery, useInfiniteQuery } from "react-query";
+import { useInfiniteQuery } from "react-query";
 import FeaturedCourse from "../components/FeaturedCourse";
 import { Spinner } from "@chakra-ui/react";
 
@@ -20,6 +15,7 @@ const SearchPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams({ q: "" });
   const location = useLocation();
+  const [searchInput, setSearchInput] = useState(searchParams.get("q") || "");
 
   const {
     isLoading,
@@ -48,18 +44,12 @@ const SearchPage = () => {
   });
 
   const handleSearchInputChange = (e) => {
-    const newQuery = e.target.value;
+    setSearchInput(e.target.value);
+  };
 
-    // Replace the current query in the URL's search params
-    const newSearchParams = new URLSearchParams(location.search);
-    newSearchParams.set("q", newQuery);
-
-    // Replace the history state with the updated search params
-    // navigate(`?${newSearchParams.toString()}`, { replace: true });
-    navigate(`/search/?q=${newQuery}`, { replace: true });
-
-    // Update the state for the query
-    setSearchParams({ q: newQuery });
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    setSearchParams({ q: searchInput });
   };
 
   // handles fetching next page
@@ -86,7 +76,10 @@ const SearchPage = () => {
   return (
     <div className="fixed inset-0 z-50 bg-gray-200 container py-6 lg:px-16 space-y-8">
       <section>
-        <form className="flex gap-4 items-center justify-evenly">
+        <form
+          className="flex gap-4 items-center justify-evenly"
+          onSubmit={handleSearchSubmit}
+        >
           <span
             className="hover:bg-gray-300 p-2 rounded-full cursor-pointer"
             onClick={() => {
@@ -100,22 +93,17 @@ const SearchPage = () => {
               autoFocus
               id="q"
               type="text"
-              value={searchParams.get("q")}
+              value={searchInput}
               onChange={handleSearchInputChange}
               placeholder="Search course..."
               className="w-full rounded-full py-3 px-4 pr-9 outline-none text-sm text-gray-600 focus:ring-2 ring-gray-300"
             />
             <span className="absolute top-3 right-3">
-              {searchParams.get("q") ? (
+              {searchInput ? (
                 <XMarkIcon
-                  className="w-5 h-5  cursor-pointer"
+                  className="w-5 h-5 cursor-pointer"
                   onClick={() => {
-                    setSearchParams((prevData) => {
-                      return {
-                        ...prevData,
-                        q: "",
-                      };
-                    });
+                    setSearchInput("");
                   }}
                 />
               ) : (
@@ -132,7 +120,7 @@ const SearchPage = () => {
         {courses ? (
           <div className="grid gap-4 sm:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 ">
             {courses?.pages?.map((results) => {
-              return results.results?.map((course, idx) => {
+              return results.results?.map((course) => {
                 return <FeaturedCourse key={course?.id} course={course} />;
               });
             })}

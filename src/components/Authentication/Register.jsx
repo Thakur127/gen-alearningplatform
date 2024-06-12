@@ -20,8 +20,6 @@ const Register = ({ role }) => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  console.log(role);
-
   return (
     <Formik
       initialValues={{

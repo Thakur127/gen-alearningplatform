@@ -38,7 +38,7 @@ const LectureModal = ({ isOpen, onOpen, onClose }) => {
     validationSchema: Yup.object({
       title: Yup.string()
         .min(3, "Must be 3 characters or long")
-        .max(20, "Must be 20 characters of less")
+        .max(64, "Must be 20 characters of less")
         .required("Required"),
       lecture_url: Yup.string()
         .url()
@@ -53,7 +53,7 @@ const LectureModal = ({ isOpen, onOpen, onClose }) => {
         .required("Required"),
     }),
     onSubmit: (values) => {
-      console.log(values);
+      // console.log(values);
       addLecture(values);
     },
   });

@@ -26,31 +26,38 @@ const Login = () => {
     try {
       const res = await axiosInstance.post("/auth/login/", credentials);
 
-      const auth_expiration = new Date(
-        res.data.refresh_expiration
-      ).toUTCString();
+      // const auth_expiration = new Date(
+      //   res.data.refresh_expiration
+      // ).toUTCString();
 
-      const access_expiration = new Date(
-        res.data.access_expiration
-      ).toUTCString();
+      // const access_expiration = new Date(
+      //   res.data.access_expiration
+      // ).toUTCString();
 
       setCookie("_auth", btoa(true), {
         expires: res.data.refersh_expiration,
       });
-      setCookie("auth_access_token", res.data.access, {
-        expireIn: res.data.access_expiration,
-        secure: true,
-      });
-      setCookie("auth_refresh_token", res.data?.refresh, {
-        expireIn: res.data.refresh_expiration,
-        secure: true,
-      });
+
+      // setCookie("auth_access_token", res.data.access, {
+      //   expireIn: res.data.access_expiration,
+      //   secure: true,
+      // });
+      // setCookie("auth_refresh_token", res.data?.refresh, {
+      //   expireIn: res.data.refresh_expiration,
+      //   secure: true,
+      // });
+
+      localStorage.setItem("access_token", res.data.access);
+      localStorage.setItem("refresh_token", res.data.refresh);
 
       // fetch current user
       fetchUser();
 
       // redirect to dashbaord
-      navigate(location.state ? location.state : "/dashboard/", {
+      const params = new URLSearchParams(location.search);
+      const redirect_url =
+        params.get("redirect_to") || location.state || "/dashboard";
+      navigate(redirect_url, {
         replace: true,
       });
     } catch (error) {

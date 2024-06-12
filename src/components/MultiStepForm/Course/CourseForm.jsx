@@ -73,9 +73,9 @@ const CourseForm = ({ ...rest }) => {
     });
   }, [outcomes, prerequisites]);
 
-  useEffect(() => {
-    console.table(values);
-  }, [values]);
+  // useEffect(() => {
+  //   console.table(values);
+  // }, [values]);
 
   const { data: availableCurrencies } = useQuery({
     queryKey: ["available-currencies"],

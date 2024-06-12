@@ -1,10 +1,21 @@
 import Login from "../../components/Authentication/Login";
 import React from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BackButton from "../../components/BackButton";
-import { Divider, useDisclosure } from "@chakra-ui/react";
+import {
+  Button,
+  ButtonGroup,
+  Divider,
+  Image,
+  useDisclosure,
+} from "@chakra-ui/react";
 import SendAccountVerificationEmail from "../../components/Authentication/SendAccountVerificationEmail";
 import SendResetPasswordEmail from "../../components/Authentication/SendResetPasswordEmail";
+
+import google from "../../assets/svgs/google.svg";
+import github from "../../assets/svgs/github.svg";
+import { LoginSocialGoogle } from "reactjs-social-login";
 
 const Signin = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -24,14 +35,10 @@ const Signin = () => {
         </div>
         <div className="mt-4">
           <h1 className="text-xl mb-6 text-center">
-            Gen - Learning never exhausts
+            Gen - A Learning Platform
           </h1>
           <div className="border p-4 rounded shadow-md">
             <Login />
-            <p className="text-center text-sm text-zinc-800">
-              {" "}
-              or connect with
-            </p>
             <p className="text-sm text-zinc-800 mt-3">
               Don't have an account?{" "}
               <Link

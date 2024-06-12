@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axiosInstance from "../api/axios";
 import FeaturedCourse from "../components/FeaturedCourse";
-import { Button, Divider, Select, Spinner } from "@chakra-ui/react";
-import InstructorCard from "../components/InstructorCard";
-import { useQuery, useInfiniteQuery, useQueryClient } from "react-query";
+import { Button, Select, Spinner } from "@chakra-ui/react";
+import { useInfiniteQuery } from "react-query";
 import Footer from "../components/Footer";
 
 const HomePage = () => {
@@ -25,7 +24,7 @@ const HomePage = () => {
       const { data } = await axiosInstance.get(uri);
       return data;
     },
-    getNextPageParam: (lastPage, _pages) => {
+    getNextPageParam: (lastPage) => {
       if (lastPage.next) {
         const urlObject = new URL(lastPage.next);
         const cursor = urlObject.searchParams.get("cursor");
@@ -41,7 +40,7 @@ const HomePage = () => {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h2 className="text-lg lg:text-2xl font-semibold">
-              Popular Course
+              Popular Courses
             </h2>
           </div>
           <Button variant={"unstyled"} fontWeight={"normal"}>
@@ -67,11 +66,11 @@ const HomePage = () => {
             </div>
           ) : (
             <div className="grid gap-4 sm:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
-              {popularCourse?.pages?.map((results) => {
-                return results.results?.map((course, idx) => {
-                  return <FeaturedCourse key={course?.id} course={course} />;
-                });
-              })}
+              {popularCourse?.pages?.map((page) =>
+                page.results.map((course) => (
+                  <FeaturedCourse key={course.id} course={course} />
+                ))
+              )}
             </div>
           )}
           <div className="text-center">

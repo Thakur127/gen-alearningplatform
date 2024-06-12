@@ -30,7 +30,13 @@ const AddReviewBox = ({ course_id }) => {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
+        setReview((prevData) => {
+          return {
+            ...prevData,
+            review: "",
+            rating: 0,
+          };
+        });
         toast({
           title: "Review Added",
           description: data.review,

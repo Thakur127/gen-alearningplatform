@@ -1,31 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { cn } from "../../lib/utils";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 
 import {
   Box,
   Button,
-  Text,
   Image,
-  Container,
   Flex,
   useDisclosure,
   useToast,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Stack,
-  Skeleton,
-  StackDivider,
-  HStack,
-  MenuDivider,
   Card,
   CardBody,
-  CardFooter,
-  IconButton,
-  AspectRatio,
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -34,17 +19,10 @@ import {
   Divider,
   Spinner,
 } from "@chakra-ui/react";
-import Lecture from "../../components/Lecture";
-import BackButton from "../../components/BackButton";
 import useGetUser from "../../hooks/useGetUser";
 import AlertBox from "../../components/AlertBox";
-import { StarIcon } from "@heroicons/react/24/outline";
-import InstructorCard from "../../components/InstructorCard";
 import Testimonial from "../../components/Testimonial";
-import ReactPlayer from "react-player";
 import { ClosedCaptionOff, Delete, Language } from "@mui/icons-material";
-import AutoResizeTextarea from "../../components/AutoResizeTextarea";
-import { useScroll } from "framer-motion";
 import { useMutation, useQuery } from "react-query";
 import getSymbolFromCurrency from "currency-symbol-map";
 import useAuth from "../../hooks/useAuth";
@@ -52,6 +30,7 @@ import Rating from "../../components/Rating";
 import AddReviewBox from "../../components/AddReviewBox";
 import moment from "moment/moment";
 import useCourseReviews from "../../hooks/useCourseReviews";
+import { CheckIcon } from "@heroicons/react/24/outline";
 
 const CourseDetailPage = () => {
   const [course, setCourse] = useState(null);
@@ -66,6 +45,7 @@ const CourseDetailPage = () => {
   const navigate = useNavigate();
   const toast = useToast();
   const { data: user } = useGetUser();
+  const isAuthenticated = useAuth();
 
   const {} = useQuery({
     queryKey: ["course", course_id],
@@ -81,7 +61,6 @@ const CourseDetailPage = () => {
   });
 
   const deleteCourse = async () => {
-    setIsDeleting(true);
     try {
       const res = await axiosInstance.delete(`/course/${course_id}`);
       navigate(-1);
@@ -96,7 +75,6 @@ const CourseDetailPage = () => {
         status: "error",
       });
     } finally {
-      setIsDeleting(false);
       onClose();
     }
   };
@@ -113,6 +91,10 @@ const CourseDetailPage = () => {
 
   const buyCourse = useMutation(
     async (course_id) => {
+      if (!isAuthenticated) {
+        navigate(`/login?redirect_to=/course/${course_id}`);
+      }
+
       const { data } = await axiosInstance.post(
         "/payments/create-checkout-session/",
         {
@@ -123,15 +105,14 @@ const CourseDetailPage = () => {
     },
     {
       onSuccess: (data) => {
+        // console.log(data);
         window.location.href = data.sessionUrl;
       },
       onError: (error) => {
-        console.log(error);
+        // console.log(error);
       },
     }
   );
-
-  const isAuthenticated = useAuth();
 
   const { data: reviews, courseRating } = useCourseReviews(course_id);
 
@@ -163,18 +144,25 @@ const CourseDetailPage = () => {
                   onClose={onClose}
                   isOpen={isOpen}
                   header={"Delete Course"}
-                  body={
-                    "Are you sure? You can't undo this action afterwards. All your lectures related to this course will be deleted permanently. "
-                  }
                   confirm={deleteCourse}
                   cancelTitle="Cancel"
                   confirmTitle={"Delete"}
-                />
+                >
+                  <p>
+                    Are you sure?{" "}
+                    <strong>You can't undo this action afterwards.</strong>
+                    All your lectures realted to this course will be deleted
+                    permanently.
+                  </p>
+                </AlertBox>
               </div>
             )}
             <div className="container bg-gray-800 px-0 relative ">
               <div className="lg:hidden">
-                <Image src={course?.cover_img} />
+                <Image
+                  src={course?.cover_img}
+                  className="max-h-96 object-cover w-full"
+                />
               </div>
               <div className="max-w-[700px] py-6 lg:py-10 px-4 lg:px-24">
                 <h4 className="text-gray-400">{course?.category}</h4>
@@ -226,7 +214,10 @@ const CourseDetailPage = () => {
                       className={`hidden lg:block absolute top-[4rem] right-32 z-10 `}
                     >
                       <Card className="w-[350px] overflow-hidden">
-                        <Image src={course?.cover_img} />
+                        <Image
+                          src={course?.cover_img}
+                          className="max-h-80 object-cover"
+                        />
                         {/* <AspectRatio ratio={16 / 9}>
                 <ReactPlayer
                   width={"350px"}
@@ -254,11 +245,13 @@ const CourseDetailPage = () => {
                               fontWeight={"regular"}
                               fontSize={"sm"}
                               onClick={() => {
-                                buyCourse.mutate(course?.id);
+                                course?.price === "0.00"
+                                  ? enroll()
+                                  : buyCourse.mutate(course?.id);
                               }}
                               className="text-sm w-full rounded p-2 bg-emerald-400 text-zinc-100 hover:bg-emerald-500 transition-colors"
                             >
-                              Buy Now
+                              {course?.price === "0.00" ? "Enroll" : "Buy Now"}
                             </Button>
                           </div>
                           <p className="text-center text-sm mt-3">
@@ -280,7 +273,7 @@ const CourseDetailPage = () => {
                     </div>
 
                     {/* For small screen */}
-                    <div className="fixed bg-black container py-4 bottom-0 flex justify-between items-center z-10 lg:hidden">
+                    <div className="fixed left-0 shadow-[-5px_0_15px_10px_rgba(0,0,0,0.5)] bg-black container py-4 bottom-0 flex justify-between items-center z-10 lg:hidden">
                       <h4 className="text-gray-100">
                         {getSymbolFromCurrency(course?.currency)}
                         {course?.price}
@@ -288,93 +281,42 @@ const CourseDetailPage = () => {
                       <Button
                         colorScheme="green"
                         onClick={() => {
-                          buyCourse.mutate(course_id);
+                          course?.price === "0.00"
+                            ? enroll()
+                            : buyCourse.mutate(course_id);
                         }}
                       >
-                        Buy Now
+                        {course?.price === "0.00" ? "Enroll" : "Buy Now"}
                       </Button>
                     </div>
                   </>
                 ) : (
-                  <div className="hidden lg:block absolute top-[4rem] right-32 z-10 w-[400px] bg-gray-200 rounded overflow-hidden shadow-md">
-                    <Image src={course?.cover_img} />
-                    <div className="p-4">
-                      <h3 className="text-xl font-semibold">Lectures</h3>
-                      <Divider className="h-[1px] bg-black my-2" />
-                      <Accordion defaultIndex={[0]} allowMultiple allowToggle>
-                        {course?.lectures.map((lecture, idx) => {
-                          return (
-                            <AccordionItem
-                              key={idx}
-                              border={"1px solid black"}
-                              marginY={"0.5rem"}
-                            >
-                              <h2>
-                                <AccordionButton
-                                  _expanded={{ bg: "black", color: "gray.100" }}
-                                >
-                                  <AccordionIcon marginRight={"1rem"} />
-                                  <Flex flexGrow={1}>
-                                    <Box as="span">{lecture?.title}</Box>
-                                  </Flex>
-                                  <Box as="span" fontSize={"sm"}>
-                                    {lecture?.duration}
-                                  </Box>
-                                </AccordionButton>
-                              </h2>
-                              <AccordionPanel>
-                                <Box
-                                  className="text-gray-600 mb-2"
-                                  fontSize={"sm"}
-                                >
-                                  {lecture?.description || "No Description."}
-                                </Box>
-                                <Link
-                                  to={`${
-                                    isEnrolled
-                                      ? "/course/" +
-                                        course?.id +
-                                        "/lecture/" +
-                                        lecture?.chapter
-                                      : "#"
-                                  }`}
-                                  className=""
-                                >
-                                  <Button
-                                    variant={"primary"}
-                                    borderRadius="2px"
-                                  >
-                                    Watch Video
-                                  </Button>
-                                </Link>
-                              </AccordionPanel>
-                            </AccordionItem>
-                          );
-                        })}
-                      </Accordion>
-                    </div>
-                  </div>
+                  <></>
                 )}
               </div>
             </div>
             <div className="py-4 lg:px-24 max-w-[700px]">
               <div className="space-y-4 ">
                 <div className="container border border-gray-400 p-2 bg-white">
-                  <h3 className="text-xl font-semibold">What you'll learn</h3>
-                  <ul className="font-inter mt-2 grid grid-cols-2 gap-2 leading-6 indent-4">
+                  <h3 className="text-xl md:text-2xl font-bold">
+                    What you'll learn
+                  </h3>
+                  <div className="font-inter mt-4 grid grid-cols-2 gap-2">
                     {JSON.parse(course?.outcomes).map((item, idx) => {
+                      if (item.length == 0) {
+                        return <></>;
+                      }
                       return (
-                        <li key={idx} className="list-disc list-inside">
-                          {""} {item}
-                        </li>
+                        <div key={idx} className="flex items-start">
+                          <CheckIcon className="w-8 h-8 text-green-500 font-bold mr-4" />
+                          <div className="text-sm ">{item}</div>
+                        </div>
                       );
                     })}
-                  </ul>
+                  </div>
                 </div>
-                <div
-                  className={`${!isEnrolled ? "block" : "sm:block lg:hidden"}`}
-                >
-                  <h3 className="text-xl font-semibold">Lectures</h3>
+                <div className={``}>
+                  <h3 className="text-xl md:text-2xl font-bold">Lectures</h3>
                   <Accordion
                     allowMultiple
                     defaultIndex={[0]}
@@ -403,7 +345,7 @@ const CourseDetailPage = () => {
                           </h2>
                           <AccordionPanel>
                             <Box className="text-gray-600 mb-2" fontSize={"sm"}>
-                              {lecture?.description || "No Description."}
+                              {lecture?.description}
                             </Box>
                             <Link
                               to={`${
@@ -414,7 +356,11 @@ const CourseDetailPage = () => {
                                     lecture?.chapter
                                   : "#"
                               }`}
-                              className=""
+                              className={`${
+                                !isEnrolled
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : "opacity-100"
+                              }`}
                             >
                               <Button variant={"primary"} borderRadius="2px">
                                 Watch Video
@@ -427,19 +373,39 @@ const CourseDetailPage = () => {
                   </Accordion>
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold">Prerequisites</h3>
-                  <div>
-                    <h4>No prerequisites are needed.</h4>
-                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold">
+                    Prerequisites
+                  </h3>
+                  <ul className="indent-4">
+                    {JSON.parse(course?.prerequisites).map((item, idx) => {
+                      return (
+                        <div key={idx}>
+                          {item.length ? (
+                            <li className="list-disc list-inside">{item}</li>
+                          ) : (
+                            "No Prerequisite needed."
+                          )}
+                        </div>
+                      );
+                    })}
+                    <h4>
+                      {JSON.parse(course?.prerequisites.length === 0) &&
+                        "No prerequisites needed."}
+                    </h4>
+                  </ul>
                 </div>
               </div>
             </div>
           </div>
-          <Divider className="h-[1px] bg-black" />
-          <div className="container py-4 lg:px-24 space-y-4">
-            <h3 className="text-xl font-semibold">Add Review</h3>
-            <AddReviewBox course_id={course_id} />
-          </div>
+          {isEnrolled && (
+            <>
+              <Divider className="h-[1px] bg-black" />
+              <div className="container py-4 lg:px-24 space-y-4">
+                <h3 className="text-xl font-semibold">Add Review</h3>
+                <AddReviewBox course_id={course_id} />
+              </div>
+            </>
+          )}
 
           <div className="bg-gray-800 container py-10 lg:px-24 w-full space-y-4">
             <h3 className="text-gray-100 text-xl text-semibold">Reviews</h3>

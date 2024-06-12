@@ -2,8 +2,6 @@ import React from "react";
 import useGetUser from "../../hooks/useGetUser";
 import {
   Avatar,
-  Button,
-  ButtonGroup,
   Divider,
   Menu,
   MenuButton,
@@ -19,7 +17,6 @@ import {
 } from "@heroicons/react/24/outline";
 import EditProfileModal from "../../components/EditProfileModal";
 import FeaturedCourse from "../FeaturedCourse";
-import { useNavigate } from "react-router-dom";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { useState } from "react";
 import { PasswordOutlined } from "@mui/icons-material";
@@ -31,7 +28,6 @@ const Profile = ({ user, courses }) => {
   const [pIsOpen, setPIsOpen] = useState(false);
   const { data: currentUser } = useGetUser();
   const { onOpen, onClose, isOpen } = useDisclosure();
-  const navigate = useNavigate();
 
   const pOnOpen = () => {
     // opens password change modal
@@ -120,58 +116,38 @@ const Profile = ({ user, courses }) => {
                   {user?.first_name} {user?.last_name}
                 </h3>
                 <p className="text-gray-500 text-sm">{user?.role}</p>
-                <div className="mt-4 space-y-1sa">
-                  <h4 className="font-medium">Bio</h4>
-                  <p className="text-sm">{user?.bio}</p>
-
-                  {user?.username === currentUser?.username && !user?.bio && (
-                    <Button
-                      colorScheme="blue"
-                      fontSize={"xs"}
-                      size={"sm"}
-                      fontWeight={"regular"}
-                      onClick={onOpen}
-                    >
-                      Add bio
-                    </Button>
-                  )}
-                </div>
-                <div className="mt-4 space-y-1">
-                  <h4 className="font-medium">Qualifications</h4>
-                  <ul>
-                    {user?.qualifications
-                      ?.split(",")
-                      ?.map((qualification, idx) => {
-                        return (
-                          <li
-                            className="text-sm list-disc list-inside"
-                            key={idx}
-                          >
-                            {qualification}
-                          </li>
-                        );
-                      })}
-                    {user?.username === currentUser?.username &&
-                      !user?.qualifications && (
-                        <Button
-                          colorScheme="blue"
-                          fontSize={"xs"}
-                          size={"sm"}
-                          fontWeight={"regular"}
-                          onClick={onOpen}
-                        >
-                          Add qualifications
-                        </Button>
-                      )}
-                  </ul>
-                </div>
+                {user?.bio.length > 0 && (
+                  <div className="mt-4 space-y-1sa">
+                    <h4 className="font-medium">Bio</h4>
+                    <p className="text-sm">{user?.bio}</p>
+                  </div>
+                )}
+                {user?.qualifications.length > 0 && (
+                  <div className="mt-4 space-y-1">
+                    <h4 className="font-medium">Qualifications</h4>
+                    <ul>
+                      {user?.qualifications
+                        ?.split(",")
+                        ?.map((qualification, idx) => {
+                          return (
+                            <li
+                              className="text-sm list-disc list-inside"
+                              key={idx}
+                            >
+                              {qualification}
+                            </li>
+                          );
+                        })}
+                    </ul>
+                  </div>
+                )}
 
                 {user?.role === "Teacher" ? (
                   <div className="mt-4 flex gap-4">
                     <p className="text-blue-500 underline underline-offset-4">
-                      {courses?.length} Courses
+                      {courses?.length}{" "}
+                      {courses?.length > 1 ? "Courses" : "Course"}
                     </p>
-                    <p className="text-blue-500">0 Collaborations</p>
                   </div>
                 ) : (
                   <></>

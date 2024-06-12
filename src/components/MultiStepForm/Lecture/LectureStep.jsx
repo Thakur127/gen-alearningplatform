@@ -10,7 +10,7 @@ const LectureStep = () => {
 
   const newLectures = useRecoilValue(newLecturesState);
 
-  console.log(newLectures);
+  // console.log(newLectures);
 
   return (
     <Box className="container py-4 lg:px-16">
